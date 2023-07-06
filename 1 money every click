@@ -1,0 +1,123 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "1+ money every click",
+    LoadingTitle = "PJEX is so cool",
+    LoadingSubtitle = "by PJEX",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "uglyfatmonkeymoneyeveryclick"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "noinvitelink",
+        RememberJoins = true
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Untitled",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"Hello"}
+    }
+})
+
+local MainTab = Window:CreateTab("Main", nil)
+local MainSection = MainTab:CreateSection("Main")
+
+local function PlaceBlockCallback(success)
+    -- Handle the success or failure response from the server here
+    print("Place block success:", success)
+end
+
+local loopRunning = false
+local Toggle = MainTab:CreateToggle({
+    Name = "Place Block",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(value)
+        if value then
+            loopRunning = true
+            while loopRunning do
+                local currentEnv = getfenv(0)
+                local game = currentEnv.game
+                if game and game:GetService("ReplicatedStorage") then
+                    local replicatedStorage = game:GetService("ReplicatedStorage")
+                    local globalEvents = replicatedStorage:WaitForChild("events-shared/network@GlobalEvents")
+                    local placeBlockEvent = globalEvents:WaitForChild("placeBlock")
+                    placeBlockEvent:FireServer(PlaceBlockCallback)
+                end
+                wait()
+            end
+        else
+            loopRunning = false
+        end
+    end
+})
+
+local Slider = MainTab:CreateSlider({
+   Name = "WalkSpeed Slider",
+   Range = {1, 350},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "sliderforwalksped", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (Value)
+   end,
+})
+
+local Slider = MainTab:CreateSlider({
+   Name = "JumpPower Slider",
+   Range = {1, 350},
+   Increment = 1,
+   Suffix = "JumpPower",
+   CurrentValue = 16,
+   Flag = "sliderjp", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = (Value)
+   end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "anti afk",
+   Callback = function()
+   -- Configuration
+local AFK_TIME_THRESHOLD = 300 -- Time in seconds after which the player is considered AFK
+local MAX_RANDOM_DELAY = 30 -- Maximum random delay in seconds between key presses
+
+-- Variables
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+local lastActivityTime = tick()
+
+-- Function to handle key press
+local function PressKey()
+    userInputService:PressKey(Enum.KeyCode.W) -- Press any desired key
+end
+
+-- Function to reset last activity time
+local function ResetActivityTime()
+    lastActivityTime = tick()
+end
+
+-- Main loop
+while true do
+    if tick() - lastActivityTime >= AFK_TIME_THRESHOLD then
+        -- Player is AFK, simulate key press
+        PressKey()
+    end
+
+    -- Reset last activity time whenever there is user input
+    userInputService.InputBegan:Connect(ResetActivityTime)
+
+    -- Add random delay between key presses to avoid detection
+    local randomDelay = math.random(1, MAX_RANDOM_DELAY)
+    wait(randomDelay)
+end
+   end,
+})
